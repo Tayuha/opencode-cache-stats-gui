@@ -1,0 +1,179 @@
+import { Schema } from "effect"
+import { Plugin, Store } from "@opencode/plugin/gui"
+
+export const Prefs = Schema.Struct({
+  pill: Schema.Boolean,
+  defaultScope: Schema.Literals(["all", "main", "subagents", "project"]),
+  pollMs: Schema.Number,
+  debounceMs: Schema.Number,
+})
+
+export type Prefs = typeof Prefs.Type
+
+export const DEFAULT_PREFS: Prefs = {
+  pill: true,
+  defaultScope: "all",
+  pollMs: 30_000,
+  debounceMs: 750,
+}
+
+export const definition = Plugin.define({
+  stores: {
+    prefs: Store.global(Prefs, DEFAULT_PREFS),
+  },
+  i18n: {
+    en: {
+      "panel.title": "Cache stats",
+
+      "aria.scope": "Scope",
+      "aria.view": "View",
+
+      "level.excellent": "Excellent",
+      "level.good": "Good",
+      "level.fair": "Fair",
+      "level.poor": "Poor",
+      "level.muted": "No rate",
+
+      "command.open": "Cache stats: open panel",
+
+      "scope.all": "Main + Subagents",
+      "scope.main": "Main Agent",
+      "scope.subagents": "Subagents",
+      "scope.project": "Project",
+
+      "view.summary": "Summary",
+      "view.models": "Models",
+      "view.usage": "Usage",
+      "view.agents": "Agents",
+
+      "status.live": "Live {{time}}",
+      "status.refreshing": "Refreshing…",
+      "status.retrying": "Retrying…",
+      "status.stale": "Stale · refresh to retry",
+
+      "action.refresh": "Refresh",
+      "action.copy": "Copy report",
+      "action.copyMarkdown": "Copy as Markdown",
+      "action.copyJson": "Copy as JSON",
+      "action.help": "Help",
+      "action.back": "Back",
+
+      "hero.cached": "cached token hit",
+      "hero.thisSession": "This session",
+      "project.sessions": "{{count}} sessions",
+      "project.truncated": "{{count}} most recent sessions",
+      "project.empty": "This project has no recorded sessions.",
+
+      "summary.assistant": "Assistant usage",
+      "metric.requests": "Requests",
+      "metric.models": "Models",
+      "metric.subagents": "Subagents",
+      "metric.tokens": "Tokens",
+      "metric.cacheRead": "Cache read",
+      "metric.cost": "Cost",
+      "summary.compaction": "Compaction (separate)",
+
+      "recent.title": "Recent {{count}}",
+      "recent.detail": "· {{hit}} cached token hit",
+      "recent.oldest": "oldest",
+      "recent.newest": "newest",
+
+      "token.title": "Assistant tokens",
+      "token.value": "Count",
+      "token.share": "Share",
+      "token.input": "Fresh input",
+      "token.cacheRead": "Cache read",
+      "token.cacheWrite": "Cache write",
+      "token.output": "Output",
+      "token.reasoning": "Reasoning",
+      "token.total": "Total tokens",
+
+      "usage.requests": "Requests",
+      "usage.withRead": "Requests with cache reads",
+      "usage.withoutRead": "Requests without cache reads",
+      "usage.average": "Average / request",
+      "usage.cost": "Recorded cost",
+      "usage.costDetail": "· USD",
+      "usage.assistant": "Assistant",
+      "usage.compaction": "Compaction",
+      "usage.combined": "Combined",
+      "usage.compactionDetail": "· {{count}} recorded steps",
+
+      "models.empty.title": "No models with recorded usage",
+      "models.empty.body": "Choose another scope or wait for an assistant step to finish.",
+      "models.requests": "{{reqs}} requests · {{tokens}} tokens",
+
+      "agents.note": "Subtree totals; nested rows overlap.",
+      "agents.empty.mainTitle": "Main excludes subagents",
+      "agents.empty.mainBody": "Select All or Subagents to inspect their usage.",
+      "agents.empty.title": "No subagents in this session tree",
+      "agents.empty.body": "Subagents will appear here when they run.",
+      "agents.showAll": "Show All scope",
+      "agents.noModel": "No model usage",
+      "agents.requests": "{{cached}}/{{total}} requests cached · {{tokens}} tokens",
+
+      "empty.noUsageTitle": "No assistant usage in this scope",
+      "empty.noUsageBody": "Run a request; this view will update automatically.",
+      "empty.waitingTitle": "Waiting for recorded usage",
+      "empty.waitingBody": "Streaming or failed steps may not report tokens yet.",
+      "empty.subagentHint": "No subagents have run. Main and All may have usage.",
+
+      "help.title": "Controls",
+      "help.hit": "Reading the numbers",
+      "help.hit.formula": "Hit = cache read / (fresh input + cache read).",
+      "help.hit.bar": "Bar: green = cache hit; red = cache miss.",
+      "help.hit.requests": "Requests count recorded steps, not retries.",
+      "help.hit.cost": "Costs are reported usage, not estimated savings.",
+      "help.hit.missing": "Missing usage is excluded, not counted as zero.",
+      "help.hit.compaction": "Compaction is separate; other auxiliary calls excluded.",
+      "help.levels": "Cache hit levels",
+      "help.level.excellent": "90% and above",
+      "help.level.good": "70–89%",
+      "help.level.fair": "40–69%",
+      "help.level.poor": "Below 40%",
+      "help.views": "Views",
+      "help.view.summary": "Summary: totals, level, trend of the last 25 requests.",
+      "help.view.models": "Models: hit rate, tokens and cost per model.",
+      "help.view.usage": "Usage: token kinds, shares, requests and averages.",
+      "help.view.agents": "Agents: per-subagent subtree totals; rows may overlap.",
+      "help.scopes": "Scopes",
+      "help.scope.all": "Main + Subagents: this session and its subagents.",
+      "help.scope.main": "Main Agent: this session only.",
+      "help.scope.subagents": "Subagents: the descendant sessions only.",
+      "help.scope.project": "Project: every top-level session in this project, worktrees included.",
+      "help.reports": "Reports",
+      "help.reports.scope": "Copies the entire selected scope, not just this view.",
+      "help.reports.content": "Includes session IDs and titles, never message text.",
+
+      "settings.title": "Cache stats",
+      "settings.description": "How the cache stats panel and composer pill behave.",
+      "settings.section": "Panel",
+      "settings.pill": "Composer pill",
+      "settings.pill.description": "Show the session's cache hit rate above the composer.",
+      "settings.scope": "Default scope",
+      "settings.scope.description": "The scope a new panel tab opens with.",
+      "settings.poll": "Refresh interval",
+      "settings.poll.description": "A safety poll on top of step-boundary refreshes.",
+      "settings.debounce": "Refresh debounce",
+      "settings.debounce.description": "How long to wait after a step ends before refreshing.",
+      "interval.off": "Off",
+      "interval.15": "15 seconds",
+      "interval.30": "30 seconds",
+      "interval.60": "60 seconds",
+      "debounce.250": "0.25 seconds",
+      "debounce.750": "0.75 seconds",
+      "debounce.1500": "1.5 seconds",
+
+      "pill.label": "Cache {{hit}}",
+      "pill.noUsage": "Cache —",
+      "pill.title": "Cache hit rate",
+      "pill.cacheRead": "Cache read",
+      "pill.cacheWrite": "Cache write",
+      "pill.open": "Open stats",
+
+      "toast.noSession": "Open a session to see cache stats.",
+      "toast.copied": "{{format}} report copied",
+      "toast.copyFailed": "Could not copy the {{format}} report.",
+    },
+  },
+})

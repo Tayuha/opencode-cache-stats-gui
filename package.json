@@ -1,0 +1,35 @@
+{
+  "name": "opencode-cache-stats-gui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cache statistics side panel, composer pill, and /cache-stats command for OpenCode Desktop.",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./gui-experimental": "./dist/gui-experimental.cjs"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@opencode/client": "2.2.7",
+    "@opencode/plugin": "2.2.7",
+    "effect": "4.1.0"
+  },
+  "devDependencies": {
+    "solid-js": "1.9.17",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "vite-plugin-solid": "2.11.10",
+    "vitest": "3.2.4"
+  }
+}
