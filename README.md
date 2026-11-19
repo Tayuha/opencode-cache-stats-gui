@@ -183,12 +183,16 @@ npm run build && git diff --exit-code -- dist
 This repository is public. Keep credentials out of it: `.env`, `.env.*`, `*.pem`, and `*.key` are
 ignored, and the plugin needs no credentials of its own.
 
+Found a problem? Report it privately through GitHub Security Advisories — see
+[`SECURITY.md`](SECURITY.md). Do not open a public issue for a vulnerability.
+
 ## Documentation
 
 - [`TODO.md`](TODO.md) — remaining verification tasks, including how to test the Project scope
 - [`docs/test-plan.md`](docs/test-plan.md) — test cases and fixtures
 - [`docs/acceptance-checklist.md`](docs/acceptance-checklist.md) — acceptance criteria and run log
 - [`docs/image-assets.md`](docs/image-assets.md) — screenshots and GIFs needed for release
+- [`SECURITY.md`](SECURITY.md) — how to report a vulnerability and what is in scope
 
 ## Development
 
