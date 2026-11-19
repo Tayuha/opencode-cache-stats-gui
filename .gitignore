@@ -4,3 +4,7 @@ assets/raw/
 .DS_Store
 coverage/
 *.tsbuildinfo
+.env
+.env.*
+*.pem
+*.key

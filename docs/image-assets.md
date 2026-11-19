@@ -184,7 +184,7 @@ Rules:
 ## 7. Git workflow for the first push
 
 ```bash
-cd /home/tayuha/Projects/opencode-plugins-creation
+cd /home/you/Projects/opencode-plugins-creation
 git init -b main
 ```
 
