@@ -11,7 +11,7 @@ and export format are kept in parity with that plugin.
 ## Requirements
 
 - **OpenCode Desktop 2.2.7** (the GUI plugin API is experimental and version-coupled).
-- A local checkout of this repository, built once with `npm run build`.
+- A local checkout of this repository. The GUI bundle is committed; no build is needed to install.
 - The GUI is desktop-only. The terminal UI does not load GUI plugin parts.
 
 The SDK pin is deliberate: `@opencode/plugin@2.2.7` and `@opencode/client@2.2.7` match the
@@ -108,7 +108,7 @@ hit = cache read / (fresh input + cache read)
 
 - Cache writes are a one-time priming cost and are excluded from the hit rate.
 - Requests are assistant steps with recorded usage, not individual retry attempts.
-- **All** includes the session and every descendant, including history before compaction.
+- **Main + Subagents** covers the session and every descendant, including history before compaction.
 - Compaction is reported separately and never enters the request totals.
 - Title generation and other auxiliary calls are excluded.
 - A cache write is reported in tokens and cost, not in the hit rate.
@@ -125,7 +125,7 @@ compaction summaries.
 | Setting | Default | Effect |
 |---|---|---|
 | Composer pill | on | Show the live hit-rate pill above the composer |
-| Default scope | All | Scope a new panel tab opens with |
+| Default scope | Main + Subagents | Scope a new panel tab opens with (all four scopes are offered) |
 | Refresh interval | 30 s | Safety poll on top of step-boundary refreshes; **Off** disables it |
 | Refresh debounce | 0.75 s | Wait after a step ends before refreshing |
 
@@ -141,6 +141,7 @@ compaction summaries.
 - Numbers can differ from the composer's own context indicator: this plugin reports recorded
   usage for the whole session tree, not the current context window.
 - The pill and panel share one collection per session, so they always agree.
+- The Project scope aggregates the 60 most recent top-level sessions; a notice appears when it truncates.
 
 ## Troubleshooting
 
@@ -152,6 +153,35 @@ compaction summaries.
 | No numbers | The session has no recorded assistant usage yet; run a turn |
 | Stale forever | The server is unreachable or the request failed; use the refresh button once it recovers |
 | Panel blank after an OpenCode update | The GUI API changed. Re-pin `@opencode/plugin` to the new Desktop version and rebuild |
+| Plugin absent after moving the folder or editing config | Run `opencode reload`, wait a few seconds, then `opencode plugin list` |
+
+## Security and privacy
+
+- **Read-only.** The plugin calls only `session.get`, `session.list`, and `message.list`. It never
+  creates, prompts, mutates, deletes, or forks a session.
+- **No egress.** There is no `fetch`, WebSocket, HTTP client, telemetry, or external URL in the
+  source or the bundle.
+- **No message content.** Totals come from assistant and compaction usage records. Exports contain
+  session IDs, titles, and aggregates — never prompts, tool output, or compaction summaries
+  (enforced by test `R-08`).
+- **No injected HTML.** Text renders through Solid text nodes; report cells are escaped and
+  control characters are stripped.
+- **Reproducible bundle.** A fresh `npm run build` is byte-identical to the committed
+  `dist/gui-experimental.cjs`, so the shipped file matches `src/`.
+- **Dependencies.** Installed only from `registry.npmjs.org`. `npm audit` reports no critical or
+  high advisories; the remaining moderate ones come from `@opencode/plugin`'s own tree and have no
+  published fix.
+
+Re-run the checks after any dependency or source change:
+
+```bash
+npm audit --audit-level=high
+npm test
+npm run build && git diff --exit-code -- dist
+```
+
+This repository is public. Keep credentials out of it: `.env`, `.env.*`, `*.pem`, and `*.key` are
+ignored, and the plugin needs no credentials of its own.
 
 ## Documentation
 
@@ -164,7 +194,7 @@ compaction summaries.
 
 ```bash
 npm run typecheck   # tsc --noEmit
-npm test            # vitest (stats, collect, live, format, derive, report)
+npm test            # vitest (stats, collect, live, project, format, derive, report)
 npm run build       # dist/gui-experimental.cjs
 ```
 
@@ -180,6 +210,7 @@ src/gui/views/           summary, models, usage, agents, help
 src/gui/data/stats.ts    pure accounting (ported verbatim)
 src/gui/data/collect.ts  paginated session-tree collection
 src/gui/data/live.ts     debounce, single-flight, polling, staleness
+src/gui/data/project.ts  lazy project-wide aggregation
 src/gui/report.ts        Markdown and JSON exports
 ```
 
