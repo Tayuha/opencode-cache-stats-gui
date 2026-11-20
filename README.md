@@ -92,7 +92,7 @@ session: totals are read from the server's stored history, so they are complete 
 
 | View | Shows |
 |---|---|
-| **Summary** | Hit rate and level, requests, models, subagents, tokens, cache read, cost, the last 25 requests as a trend, and compaction cost when present |
+| **Summary** | Hit rate and level, requests, models, subagents, tokens across all requests, cache read, cost, the latest request against the model's context limit, the last 25 requests as a trend, and compaction cost when present |
 | **Models** | One row per provider/model with hit rate, a hit bar, requests, tokens, and recorded cost; healthiest first |
 | **Usage** | The five token kinds with their share of the total, requests with and without cache reads, per-request averages, recorded cost, and a separate compaction breakdown |
 | **Agents** | One row per subagent with its subtree hit rate, model, requests, tokens, and cost; nested rows overlap on purpose |

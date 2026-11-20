@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { modelRows, providerOf, scopeStats, shortModel, subRows } from "./derive.ts"
+import { latestRequest, modelRows, providerOf, scopeStats, shortModel, subRows } from "./derive.ts"
 import type { Collected, Sub } from "./data/collect.ts"
 import { hitPct, summarize } from "./data/stats.ts"
 import { assistant } from "./data/fixtures.ts"
@@ -59,6 +59,23 @@ describe("subRows", () => {
     const collected = stats()
     collected.subs.push({ ...collected.subs[0]!, id: "ses_other", hit: 10, reqs: 9 })
     expect(subRows(collected).map((sub) => sub.id)).toEqual(["ses_sub", "ses_other"])
+  })
+})
+
+describe("latestRequest", () => {
+  it("returns nothing without samples", () => {
+    expect(latestRequest({ ...summarize([], "root"), subagents: 0, subs: [] })).toBeUndefined()
+  })
+
+  it("returns the newest request in scope", () => {
+    const summary = summarize(
+      [
+        assistant({ id: "old", created: 1, completed: 2 }),
+        assistant({ id: "new", created: 5, completed: 6 }),
+      ],
+      "root",
+    )
+    expect(latestRequest({ ...summary, subagents: 0, subs: [] })?.id).toBe("new")
   })
 })
 

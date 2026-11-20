@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal, on, onCleanup, Show, Switch, Ma
 import { usePlugin, type MountedSession, type PanelTab } from "@opencode/plugin/gui"
 import type { definition } from "./definition.ts"
 import type { Collected, Scope, ScopeStats } from "./data/collect.ts"
-import { hitPct, summarize } from "./data/stats.ts"
+import { hitPct, summarize, tokenTotal } from "./data/stats.ts"
 import { affectedSessions, type LiveStats, type LiveState } from "./data/live.ts"
 import {
   limitSessions,
@@ -13,7 +13,7 @@ import {
   type ProjectStatsCache,
 } from "./data/project.ts"
 import { hostFor } from "./host.ts"
-import { scopeStats } from "./derive.ts"
+import { latestRequest, scopeStats } from "./derive.ts"
 import { copyReport } from "./report.ts"
 import {
   formatHit,
@@ -141,6 +141,21 @@ export function CacheStatsPanel(props: CacheStatsPanelProps) {
     if (scope() === "project") return projectState()?.stats
     const stats = snapshot()
     return stats ? scopeStats(stats, scope() as Scope) : undefined
+  })
+
+  // Reconciles this panel with the context-window readout: the newest request, against its model limit.
+  const latest = createMemo(() => {
+    const stats = selected()
+    const sample = stats ? latestRequest(stats) : undefined
+    if (!sample) return undefined
+    const cut = sample.model.indexOf("/")
+    const providerID = cut < 0 ? sample.model : sample.model.slice(0, cut)
+    const modelID = cut < 0 ? "" : sample.model.slice(cut + 1)
+    const models = props.session.server.data.location.model.list(props.session.location)
+    const model = models?.find(
+      (item) => item.providerID === providerID && (item.modelID === modelID || item.id === modelID),
+    )
+    return { tokens: tokenTotal(sample.usage), limit: model?.limit.context }
   })
 
   const hit = () => (selected() ? hitPct(selected()!.acc) : -1)
@@ -368,7 +383,7 @@ export function CacheStatsPanel(props: CacheStatsPanelProps) {
           </Show>
           <Switch>
             <Match when={view() === "summary"}>
-              <Summary stats={selected()!} scope={scope()} />
+              <Summary stats={selected()!} scope={scope()} latest={latest()} />
             </Match>
             <Match when={view() === "models"}>
               <Models stats={selected()!} />

@@ -6,7 +6,11 @@ import { hitPct, tokenTotal } from "../data/stats.ts"
 import { formatCost, formatNumber } from "../format.ts"
 import { Empty, Metric, Trend } from "../components.tsx"
 
-export function Summary(props: { stats: ScopeStats; scope: Scope | "project" }) {
+export function Summary(props: {
+  stats: ScopeStats
+  scope: Scope | "project"
+  latest?: { tokens: number; limit?: number }
+}) {
   const ctx = usePlugin<typeof definition>()
   const acc = () => props.stats.acc
 
@@ -34,7 +38,7 @@ export function Summary(props: { stats: ScopeStats; scope: Scope | "project" }) 
         <Metric label={ctx.t("metric.models")} value={String(props.stats.perModel.size)} />
         <Metric label={ctx.t("metric.subagents")} value={String(props.stats.subagents)} />
         <Metric
-          label={ctx.t("metric.tokens")}
+          label={ctx.t("metric.tokensAll")}
           value={formatNumber(tokenTotal(acc()))}
           tone="info"
         />
@@ -44,6 +48,17 @@ export function Summary(props: { stats: ScopeStats; scope: Scope | "project" }) 
           tone="success"
         />
         <Metric label={ctx.t("metric.cost")} value={formatCost(acc().cost)} />
+        <Show when={props.latest}>
+          <Metric
+            label={ctx.t("summary.latest")}
+            value={Math.round(props.latest!.tokens).toLocaleString(ctx.locale.locale())}
+            suffix={
+              props.latest!.limit
+                ? `${Math.round((100 * props.latest!.tokens) / props.latest!.limit)}%`
+                : undefined
+            }
+          />
+        </Show>
       </div>
 
       <Trend

@@ -1,11 +1,16 @@
 import { selectScope, type Collected, type Scope, type ScopeStats, type Sub } from "./data/collect.ts"
-import { hitPct, sanitize, type Acc } from "./data/stats.ts"
+import { hitPct, sanitize, type Acc, type RequestSample } from "./data/stats.ts"
 
 export type ModelRow = readonly [model: string, acc: Acc]
 
 /** The scope's totals, unchanged; `all` is the collected value itself. */
 export function scopeStats(stats: Collected, scope: Scope): ScopeStats {
   return selectScope(stats, scope)
+}
+
+/** The newest recorded request in scope, if any. */
+export function latestRequest(stats: ScopeStats): RequestSample | undefined {
+  return stats.recent[stats.recent.length - 1]
 }
 
 /** Models with recorded usage, healthiest first, then busiest. */

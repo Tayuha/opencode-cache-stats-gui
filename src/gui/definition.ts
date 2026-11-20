@@ -69,6 +69,8 @@ export const definition = Plugin.define({
       "metric.models": "Models",
       "metric.subagents": "Subagents",
       "metric.tokens": "Tokens",
+      "metric.tokensAll": "Tokens (all requests)",
+      "summary.latest": "Latest request",
       "metric.cacheRead": "Cache read",
       "metric.cost": "Cost",
       "summary.compaction": "Compaction (separate)",
